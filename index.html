@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juragan Ayam 🐔</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <section id="menu" class="screen active">
+    <div class="card hero">
+      <div class="logo">🐔</div>
+      <div class="tag">SIMULASI BISNIS</div>
+      <h1>JURAGAN<br><span>AYAM</span></h1>
+      <p>Bangun kios ayam potongmu, layani pelanggan, atur stok, dan jadilah juragan paling sukses!</p>
+      <button class="main-btn" id="start">Mulai Jualan 🛒</button>
+      <div class="tips">💡 Tip: jangan kehabisan stok dan jaga kepuasan pelanggan!</div>
+    </div>
+  </section>
+
+  <section id="game" class="screen">
+    <header>
+      <div class="brand"><span>🐔</span><b>Juragan Ayam</b></div>
+      <div class="day">Hari <b id="day">1</b></div>
+    </header>
+
+    <div class="stats">
+      <div>💰 <small>Uang</small><b id="money">Rp100.000</b></div>
+      <div>🐔 <small>Stok</small><b id="stock">10 ekor</b></div>
+      <div>⭐ <small>Reputasi</small><b id="rep">70%</b></div>
+      <div>📈 <small>Level</small><b id="level">1</b></div>
+    </div>
+
+    <div class="shop">
+      <div class="shop-scene">
+        <div class="sky"></div>
+        <div class="sign">TOKO AYAM<br><span>JURAGAN AYAM</span></div>
+        <div class="awning">🟨 🟧 🟨 🟧 🟨 🟧</div>
+        <div class="counter">🧺 🐔 🐔 🐔 🧺</div>
+        <div class="seller">🧑‍🍳</div>
+        <div class="customer" id="customer">🧑</div>
+        <div class="bubble" id="bubble">Halo! Saya mau pesan ayam.</div>
+      </div>
+
+      <div class="control">
+        <div class="mission">
+          <span class="tag">PESANAN PELANGGAN</span>
+          <h2 id="orderTitle">Pesanan Ayam</h2>
+          <p id="orderText">Pelanggan membutuhkan 2 ekor ayam.</p>
+        </div>
+
+        <div id="orderButtons" class="choices"></div>
+
+        <div class="actions">
+          <button id="buy" class="secondary">📦 Beli Stok</button>
+          <button id="next" class="main-btn">Layani Pelanggan</button>
+        </div>
+        <p class="feedback" id="feedback"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="card result">
+      <div class="logo">🏆</div>
+      <div class="tag">TOKO SELESAI BEROPERASI</div>
+      <h1>Hari Ini<br><span>Sukses!</span></h1>
+      <div class="summary">
+        <div><span>💰 Uang</span><b id="finalMoney">Rp0</b></div>
+        <div><span>⭐ Reputasi</span><b id="finalRep">0%</b></div>
+        <div><span>📈 Level</span><b id="finalLevel">1</b></div>
+      </div>
+      <p id="resultText"></p>
+      <button class="main-btn" id="again">Main Lagi 🔄</button>
+    </div>
+  </section>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
