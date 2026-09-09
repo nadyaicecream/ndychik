@@ -1,73 +1,168 @@
-let state;
-const orders=[
- {qty:2, reward:15000, text:"Pelanggan membutuhkan 2 ekor ayam."},
- {qty:3, reward:21000, text:"Pelanggan membutuhkan 3 ekor ayam."},
- {qty:1, reward:8000, text:"Pelanggan membutuhkan 1 ekor ayam."},
- {qty:4, reward:28000, text:"Pelanggan membutuhkan 4 ekor ayam."}
-];
-let order;
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
 
-const $=id=>document.getElementById(id);
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active")}
-function rupiah(n){return "Rp"+n.toLocaleString("id-ID")}
+const slides = $$('.slide');
+const dots = $('#dots');
+let currentSlide = 0;
+let autoPlay;
 
-$("start").onclick=()=>startGame();
-$("again").onclick=()=>startGame();
+slides.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'dot-slide' + (i === 0 ? ' active' : '');
+  d.setAttribute('aria-label', `Slide ${i + 1}`);
+  d.onclick = () => showSlide(i);
+  dots.appendChild(d);
+});
 
-function startGame(){
- state={money:100000,stock:10,rep:70,level:1,day:1,served:0};
- show("game"); newOrder(); update();
+function showSlide(index) {
+  currentSlide = (index + slides.length) % slides.length;
+  slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+  $$('.dot-slide').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
 }
-function update(){
- $("money").textContent=rupiah(state.money);$("stock").textContent=state.stock+" ekor";
- $("rep").textContent=state.rep+"%";$("level").textContent=state.level;$("day").textContent=state.day;
+function startAuto() {
+  clearInterval(autoPlay);
+  autoPlay = setInterval(() => showSlide(currentSlide + 1), 4500);
 }
-function newOrder(){
- order=orders[Math.floor(Math.random()*orders.length)];
- $("orderTitle").textContent="Pesanan "+order.qty+" Ekor";
- $("orderText").textContent=order.text;
- $("bubble").textContent="Kak, saya mau "+order.qty+" ekor ayam ya!";
- $("feedback").textContent="";
- $("orderButtons").innerHTML=`
- <button class="choice" data-action="correct">🐔 Siapkan ${order.qty} ekor</button>
- <button class="choice" data-action="more">🐔 Siapkan ${order.qty+1} ekor</button>
- <button class="choice" data-action="less">🐔 Siapkan ${Math.max(1,order.qty-1)} ekor</button>`;
- document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>serve(b.dataset.action));
-}
-function serve(action){
- if(state.stock<=0){feedback("Stok habis! Beli stok dulu 📦",false);return}
- if(action==="correct"){
-   if(state.stock<order.qty){feedback("Stok tidak cukup. Beli stok dulu!",false);return}
-   state.stock-=order.qty; state.money+=order.reward; state.rep=Math.min(100,state.rep+4); state.served++;
-   feedback("Pesanan tepat! Pelanggan puas 😊 +"+rupiah(order.reward),true);
- }else if(action==="more"){
-   const q=order.qty+1;
-   if(state.stock<q){feedback("Stok tidak cukup!",false);return}
-   state.stock-=q;state.money+=order.reward;state.rep=Math.max(0,state.rep-2);state.served++;
-   feedback("Ups, kelebihan satu. Tetap dibayar sesuai pesanan 😅",false);
- }else{
-   const q=Math.max(1,order.qty-1);
-   if(state.stock<q){feedback("Stok tidak cukup!",false);return}
-   state.stock-=q;state.money+=Math.floor(order.reward*.5);state.rep=Math.max(0,state.rep-7);state.served++;
-   feedback("Pesanan kurang, pelanggan agak kecewa 😅",false);
- }
- update();
- if(state.served>=5){setTimeout(endDay,700)}else{setTimeout(newOrder,800)}
-}
-function feedback(t,good){
- $("feedback").textContent=t;$("feedback").className="feedback "+(good?"good":"bad");
-}
-$("buy").onclick=()=>{
- const cost=25000;
- if(state.money<cost){feedback("Uang belum cukup untuk membeli stok.",false);return}
- state.money-=cost;state.stock+=5;feedback("Berhasil membeli 5 ekor stok! 📦",true);update();
+$('#prevSlide').onclick = () => { showSlide(currentSlide - 1); startAuto(); };
+$('#nextSlide').onclick = () => { showSlide(currentSlide + 1); startAuto(); };
+startAuto();
+
+$('#menuToggle').onclick = () => $('#navLinks').classList.toggle('show');
+$$('.nav-links a').forEach(a => a.onclick = () => $('#navLinks').classList.remove('show'));
+
+$('.search-toggle').onclick = () => {
+  $('#searchBar').classList.toggle('show');
+  if ($('#searchBar').classList.contains('show')) $('#searchInput').focus();
 };
-function endDay(){
- if(state.rep>=85)state.money+=15000;
- if(state.money>=140000)state.level=2;
- if(state.money>=190000)state.level=3;
- $("finalMoney").textContent=rupiah(state.money);$("finalRep").textContent=state.rep+"%";$("finalLevel").textContent=state.level;
- $("resultText").textContent=state.rep>=85?"Toko kamu makin dipercaya pelanggan. Pertahankan pelayanan yang ramah! 🌟":
- "Lumayan! Atur stok dan layani pesanan dengan lebih teliti supaya toko makin maju. 💪";
- show("result");
+
+const translations = {
+  id: {
+    navHome:'Home', navAbout:'About', navMenu:'Menu', navPromo:'Promo', navContact:'Contact',
+    eyebrow:'A LITTLE SCOOP OF HAPPINESS', heroTitle:'Your happy<br><em>ice cream</em> moment.',
+    heroText:'Es krim creamy dengan rasa yang dibuat untuk menemani hari-hari manismu.',
+    explore:'Explore Menu →', story:'Our Story', fresh:'Freshly made, always creamy.',
+    aboutTitle:"More than ice cream,<br><em>it's a mood.</em>",
+    aboutText:'Ncream hadir untuk membuat momen sederhana terasa lebih spesial. Kami percaya satu scoop yang enak bisa mengubah mood dalam sekejap.',
+    flavors:'Signature flavors', happy:'Happy moments', menuEyebrow:'SCOOP YOUR FAVORITE',
+    menuTitle:'Our <em>favorites</em>', promoTitle:'Make it a<br><em>double scoop.</em>',
+    promoText:'Tambah satu scoop favoritmu dan dapatkan harga spesial.', seeMenu:'See Menu →',
+    contactTitle:"Let's make your<br><em>day sweeter.</em>", cartTitle:'Your Cart',
+    emptyCart:'Your cart is empty.'
+  },
+  en: {
+    navHome:'Home', navAbout:'About', navMenu:'Menu', navPromo:'Promo', navContact:'Contact',
+    eyebrow:'A LITTLE SCOOP OF HAPPINESS', heroTitle:'Your happy<br><em>ice cream</em> moment.',
+    heroText:'Creamy ice cream with flavors made to make your sweetest days even better.',
+    explore:'Explore Menu →', story:'Our Story', fresh:'Freshly made, always creamy.',
+    aboutTitle:"More than ice cream,<br><em>it's a mood.</em>",
+    aboutText:'Ncream is here to make simple moments feel extra special. We believe one delicious scoop can instantly brighten your mood.',
+    flavors:'Signature flavors', happy:'Happy moments', menuEyebrow:'SCOOP YOUR FAVORITE',
+    menuTitle:'Our <em>favorites</em>', promoTitle:'Make it a<br><em>double scoop.</em>',
+    promoText:'Add one more scoop of your favorite flavor and get a special price.', seeMenu:'See Menu →',
+    contactTitle:"Let's make your<br><em>day sweeter.</em>", cartTitle:'Your Cart',
+    emptyCart:'Your cart is empty.'
+  }
+};
+
+function setLanguage(lang) {
+  $$('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (translations[lang][key]) el.innerHTML = translations[lang][key];
+  });
+  const input = $('#searchInput');
+  input.placeholder = lang === 'id' ? input.dataset.placeholderId : input.dataset.placeholderEn;
 }
+$('#language').onchange = e => setLanguage(e.target.value);
+
+const cart = [];
+const formatIDR = n => 'Rp' + n.toLocaleString('id-ID');
+
+function addToCart(name, price) {
+  const existing = cart.find(item => item.name === name);
+  if (existing) existing.qty++;
+  else cart.push({name, price: Number(price), qty: 1});
+  renderCart();
+  openCart();
+}
+
+function renderCart() {
+  const box = $('#cartItems');
+  const count = cart.reduce((sum, item) => sum + item.qty, 0);
+  $('#cartCount').textContent = count;
+  if (!cart.length) {
+    box.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
+    $('#cartTotal').textContent = 'Rp0';
+    updateCheckout();
+    return;
+  }
+  box.innerHTML = cart.map((item, i) => `
+    <div class="cart-item">
+      <div><h4>${item.name}</h4><p>${formatIDR(item.price)} × ${item.qty}</p></div>
+      <div class="qty">
+        <button onclick="changeQty(${i},-1)">−</button><span>${item.qty}</span><button onclick="changeQty(${i},1)">+</button>
+      </div>
+    </div>
+  `).join('');
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  $('#cartTotal').textContent = formatIDR(total);
+  updateCheckout();
+}
+
+function changeQty(index, delta) {
+  cart[index].qty += delta;
+  if (cart[index].qty <= 0) cart.splice(index, 1);
+  renderCart();
+}
+window.changeQty = changeQty;
+
+function updateCheckout() {
+  const lines = cart.length
+    ? cart.map(i => `${i.name} x ${i.qty}`).join(', ')
+    : 'pesanan';
+  const text = `Halo kak aku mau pesan ${lines} ya;`;
+  $('#checkoutBtn').href = `https://wa.me/6285691428657?text=${encodeURIComponent(text)}`;
+}
+function openCart() {
+  $('#cartPanel').classList.add('open');
+  $('#cartOverlay').classList.add('show');
+}
+function closeCart() {
+  $('#cartPanel').classList.remove('open');
+  $('#cartOverlay').classList.remove('show');
+}
+$('#cartOpen').onclick = openCart;
+$('#cartClose').onclick = closeCart;
+$('#cartOverlay').onclick = closeCart;
+
+$$('.quick-add').forEach(btn => {
+  btn.onclick = () => addToCart(btn.dataset.product, btn.dataset.price);
+});
+
+$$('.pill').forEach(pill => {
+  pill.onclick = () => {
+    $$('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    const filter = pill.dataset.filter;
+    $$('.product-card').forEach(card => {
+      card.style.display = filter === 'all' || card.dataset.category === filter ? '' : 'none';
+    });
+  };
+});
+
+$('#searchInput').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  let found = 0;
+  $$('.product-card').forEach(card => {
+    const match = card.dataset.name.toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) found++;
+  });
+  $('#noResult').style.display = found ? 'none' : 'block';
+  if (!q) {
+    $$('.product-card').forEach(card => card.style.display = '');
+    $('#noResult').style.display = 'none';
+  }
+});
+
+setLanguage('id');
+renderCart();
